@@ -36,7 +36,7 @@ def login():
 @app.route('/logout')
 def logout():
     session.clear()
-    return render_template('message.html', message='You were logged out')
+    return render_template('home.html', message='You were logged out')
     
 @app.route('/login/authorized')
 def authorized():
@@ -49,14 +49,17 @@ def authorized():
             session['github_token'] = (resp['access_token'], '') #save the token to prove that the user logged in
             session['user_data']=github.get('user').data
             #pprint.pprint(vars(github['/email']))
-            #pprint.pprint(vars(github['api/2/accounts/profile/']))
+           # pprint.pprint(vars(github['api/2/accounts/profile/']))
             message='You were successfully logged in as ' + session['user_data']['login'] + '.'
         except Exception as inst:
             session.clear()
             print(inst)
             message='Unable to login, please try again.  '
-    return render_template('message.html', message=message)
+    return render_template('home.html', message=message)
 
+@github.tokengetter
+def get_github_oauth_token():
+    return session['github_token']
     
 @app.route("/")
 def render_home():

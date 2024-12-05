@@ -49,7 +49,10 @@ def login():
 @app.route('/logout')
 def logout():
     session.clear()
-    return render_template('home.html', message='You were logged out')
+    PostData = ""
+    for c in collection.find():
+        PostData = PostData + Markup("<div class='card'>\n\t<div class='card-header'>"+c["User"]+"</div>\n\t<div class='card-body'>"+c["Message"]+"</div>\n</div>\n")
+    return render_template('home.html', message='You were logged out', PostData=PostData)
     
 @app.route('/login/authorized')
 def authorized():
@@ -68,7 +71,10 @@ def authorized():
             session.clear()
             print(inst)
             message='Unable to login, please try again.  '
-    return render_template('home.html', message=message)
+    PostData = ""
+    for c in collection.find():
+        PostData = PostData + Markup("<div class='card'>\n\t<div class='card-header'>"+c["User"]+"</div>\n\t<div class='card-body'>"+c["Message"]+"</div>\n</div>\n")
+    return render_template('home.html', message=message, PostData=PostData)
 
 @github.tokengetter
 def get_github_oauth_token():
@@ -76,7 +82,11 @@ def get_github_oauth_token():
     
 @app.route("/")
 def render_home():
-   return render_template('home.html')
+    PostData = ""
+    for c in collection.find():
+        PostData = PostData + Markup("<div class='card'>\n\t<div class='card-header'>"+c["User"]+"</div>\n\t<div class='card-body'>"+c["Message"]+"</div>\n</div>\n")
+   
+    return render_template('home.html', PostData=PostData)
 
 
 if __name__=="__main__":

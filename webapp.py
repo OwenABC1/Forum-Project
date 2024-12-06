@@ -80,14 +80,21 @@ def authorized():
 def get_github_oauth_token():
     return session['github_token']
     
-@app.route("/")
+@app.route("/", methods=['GET','POST'])
 def render_home():
     PostData = ""
+    documents = []
+    if "post" in request.form:
+        newDict = {"User":"Test","Message": request.form["post"]}
+        collection.insert_one(newDict)
+        PostData = PostData + Markup("<div class='card'>\n\t<div class='card-header'>"+c["User"]+"</div>\n\t<div class='card-body'>"+c["Message"]+"</div>\n</div>\n")
+        print(request.form["post"])
+    
     for c in collection.find():
         PostData = PostData + Markup("<div class='card'>\n\t<div class='card-header'>"+c["User"]+"</div>\n\t<div class='card-body'>"+c["Message"]+"</div>\n</div>\n")
-   
-    return render_template('home.html', PostData=PostData)
-
+        documents.append({"User": c["User"], "Message": c["Message"]})
+    
+    return render_template('home.html', PostData=PostData, documents=documents)
 
 if __name__=="__main__":
     app.run(debug=True)

@@ -50,9 +50,11 @@ def login():
 def logout():
     session.clear()
     PostData = ""
+    documents = []
     for c in collection.find():
         PostData = PostData + Markup("<div class='card'>\n\t<div class='card-header'>"+c["User"]+"</div>\n\t<div class='card-body'>"+c["Message"]+"</div>\n</div>\n")
-    return render_template('home.html', message='You were logged out', PostData=PostData)
+        documents.append({"User": c["User"], "Message": c["Message"]})
+    return render_template('home.html', message='You were logged out', PostData=PostData, documents=documents)
     
 @app.route('/login/authorized')
 def authorized():
@@ -64,7 +66,7 @@ def authorized():
         try:
             session['github_token'] = (resp['access_token'], '') #save the token to prove that the user logged in
             session['user_data']=github.get('user').data
-            #pprint.pprint(vars(github['/email']))
+           #pprint.pprint(vars(github['/email']))
            # pprint.pprint(vars(github['api/2/accounts/profile/']))
             message='You were successfully logged in as ' + session['user_data']['login'] + '.'
         except Exception as inst:
@@ -72,9 +74,11 @@ def authorized():
             print(inst)
             message='Unable to login, please try again.  '
     PostData = ""
+    documents = []
     for c in collection.find():
         PostData = PostData + Markup("<div class='card'>\n\t<div class='card-header'>"+c["User"]+"</div>\n\t<div class='card-body'>"+c["Message"]+"</div>\n</div>\n")
-    return render_template('home.html', message=message, PostData=PostData)
+        documents.append({"User": c["User"], "Message": c["Message"]})
+    return render_template('home.html', message=message, PostData=PostData, documents=documents)
 
 @github.tokengetter
 def get_github_oauth_token():
@@ -84,12 +88,21 @@ def get_github_oauth_token():
 def render_home():
     PostData = ""
     documents = []
+
     if "post" in request.form:
-        newDict = {"User":"Test","Message": request.form["post"]}
-        collection.insert_one(newDict)
-        PostData = PostData + Markup("<div class='card'>\n\t<div class='card-header'>"+c["User"]+"</div>\n\t<div class='card-body'>"+c["Message"]+"</div>\n</div>\n")
-        print(request.form["post"])
-    
+        newDict = {"User":session['user_data']['login'],"Message": request.form["post"]} 
+        LastDoc = {}
+        for doc in collection.find():
+            LastDoc = doc
+        print(newDict)
+        print(LastDoc)
+        if newDict["User"] != LastDoc["User"] or newDict["Message"] != LastDoc["Message"]:
+            collection.insert_one(newDict)
+            #PostData = PostData + Markup("<div class='card'>\n\t<div class='card-header'>"+c["User"]+"</div>\n\t<div class='card-body'>"+c["Message"]+"</div>\n</div>\n")
+            print(request.form["post"])
+         
+        
+        
     for c in collection.find():
         PostData = PostData + Markup("<div class='card'>\n\t<div class='card-header'>"+c["User"]+"</div>\n\t<div class='card-body'>"+c["Message"]+"</div>\n</div>\n")
         documents.append({"User": c["User"], "Message": c["Message"]})

@@ -111,4 +111,4 @@ def render_home():
     return render_template('home.html', PostData=PostData, documents=documents)
 
 if __name__=="__main__":
-    app.run(debug=True)
+    app.run(debug=False)

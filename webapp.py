@@ -37,6 +37,7 @@ github = oauth.remote_app(
     authorize_url='https://github.com/login/oauth/authorize' #URL for github's OAuth login
 )
 
+
 @app.context_processor
 def inject_logged_in():
     is_logged_in = 'github_token' in session #this will be true if the token is in the session and false otherwise
@@ -88,18 +89,18 @@ def get_github_oauth_token():
 def render_home():
     PostData = ""
     documents = []
-
-    if "post" in request.form:
-        newDict = {"User":session['user_data']['login'],"Message": request.form["post"]} 
-        LastDoc = {}
-        for doc in collection.find():
-            LastDoc = doc
-        print(newDict)
-        print(LastDoc)
-        if newDict["User"] != LastDoc["User"] or newDict["Message"] != LastDoc["Message"]:
-            collection.insert_one(newDict)
-            #PostData = PostData + Markup("<div class='card'>\n\t<div class='card-header'>"+c["User"]+"</div>\n\t<div class='card-body'>"+c["Message"]+"</div>\n</div>\n")
-            print(request.form["post"])
+    if 'github_token' in session:
+        if "post" in request.form:
+            newDict = {"User":session['user_data']['login'],"Message": request.form["post"]} 
+            LastDoc = {}
+            for doc in collection.find():
+                LastDoc = doc
+            print(newDict)
+            print(LastDoc)
+            if newDict["User"] != LastDoc["User"] or newDict["Message"] != LastDoc["Message"]:
+                collection.insert_one(newDict)
+                #PostData = PostData + Markup("<div class='card'>\n\t<div class='card-header'>"+c["User"]+"</div>\n\t<div class='card-body'>"+c["Message"]+"</div>\n</div>\n")
+                print(request.form["post"])
          
         
         

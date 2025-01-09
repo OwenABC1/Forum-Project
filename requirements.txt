@@ -6,3 +6,4 @@ Werkzeug==2.2.2
 wheel
 gunicorn
 flask_oauthlib
+pymongo
